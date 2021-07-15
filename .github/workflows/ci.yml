@@ -7,13 +7,13 @@ on:
       - '**.md'
     branches:
       - main
-      - 'release/**'
+      - 'release/*'
     tags:
       - '*'
   pull_request:
     branches:
       - main
-      - 'release/**'
+      - 'release/*'
 
 defaults:
   run:
@@ -55,7 +55,7 @@ jobs:
           if [[ ${GITHUB_REF} == "refs/tags/"* ]]
           then
             echo tag
-            CURRENT_TAG=$(echo ${GITHUB_REF#refs/tags/} | tr '/' '-')
+            CURRENT_TAG=$(echo ${GITHUB_REF#refs/tags/} | tr '/' '-' | sed -e 's/^[v]//')
             echo $CURRENT_TAG
             TAGS="$TAGS $CURRENT_TAG"
           else # PR build
