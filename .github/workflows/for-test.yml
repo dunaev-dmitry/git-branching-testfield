@@ -1,0 +1,27 @@
+name: Test exit codes in for loop
+
+on:
+  push:
+    branches:
+      - main
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  docker:
+    runs-on: ubuntu-20.04
+    env:
+      EXIT_NUM: "7"
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Run test script
+      run: |
+        for num in {0..10}
+        do
+          echo $num
+          ./test.sh $num
+        done
+
