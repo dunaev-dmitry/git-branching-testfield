@@ -1,14 +1,20 @@
 name: Scheduled testing
 
 on:
+  workflow_dispatch:
+    inputs:
+      some_input:
+        required: true
+        default: "main"
   schedule:
-    - cron: "* * * * 1-5"
+    - cron: "* * * * *"
 
 jobs:
   vars:
     runs-on: ubuntu-latest
     outputs:
-      set: ${{ steps.vars.outputs.oddity }}
+      set: ${{ steps.vars.outputs.set }}
+      some_input: ${{ steps.vars.outputs.some_input }}
     steps:
       - name: Get minute set
         id: vars
@@ -18,18 +24,27 @@ jobs:
           export SET=$(( 10#$MIN % 2 ))
           echo $MIN
           echo $SET
-          echo ::set-output name=set::$SET)
+          echo ::set-output name=set::$SET
+          echo ::set-output name=some_input::$(echo "${{ github.event.inputs.some_input || 'main' }}")
+
+  output:
+    needs: [ "vars" ]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "${{ needs.vars.outputs.set }}"
+      - run: echo "${{ github.event.inputs.some_input }}"
+      - run: echo "${{ needs.vars.outputs.some_input }}"
 
   set_1:
     needs: [ "vars" ]
     runs-on: ubuntu-latest
-    if: "!cancelled() && needs.vars.outputs.set == '1')"
+    if: needs.vars.outputs.set == '1'
     steps:
       - run: echo "Current set is ${{ needs.vars.outputs.set }}"
 
   set_2:
     needs: [ "vars" ]
     runs-on: ubuntu-latest
-    if: "!cancelled() && needs.vars.outputs.set == '0')"
+    if: needs.vars.outputs.set == '0'
     steps:
       - run: echo "Current set is ${{ needs.vars.outputs.set }}"
