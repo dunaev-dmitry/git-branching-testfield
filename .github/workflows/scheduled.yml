@@ -1,0 +1,35 @@
+name: Scheduled testing
+
+on:
+  schedule:
+    - cron: "* * * * 0-4"
+
+jobs:
+  vars:
+    runs-on: ubuntu-latest
+    outputs:
+      set: ${{ steps.vars.outputs.oddity }}
+    steps:
+      - name: Get minute set
+        id: vars
+        run: |
+          export DOW=$(date +%u)
+          export MIN=$(date +%M)
+          export SET=$(( 10#$MIN % 2 ))
+          echo $MIN
+          echo $SET
+          echo ::set-output name=set::$SET)
+
+  set_1:
+    needs: [ "vars" ]
+    runs-on: ubuntu-latest
+    if: "!cancelled() && needs.vars.outputs.set == '1')"
+    steps:
+      - run: echo "Current set is ${{ needs.vars.outputs.set }}"
+
+  set_2:
+    needs: [ "vars" ]
+    runs-on: ubuntu-latest
+    if: "!cancelled() && needs.vars.outputs.set == '0')"
+    steps:
+      - run: echo "Current set is ${{ needs.vars.outputs.set }}"
