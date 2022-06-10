@@ -2,7 +2,7 @@ name: Scheduled testing
 
 on:
   schedule:
-    - cron: "* * * * 0-4"
+    - cron: "* * * * 1-5"
 
 jobs:
   vars:
